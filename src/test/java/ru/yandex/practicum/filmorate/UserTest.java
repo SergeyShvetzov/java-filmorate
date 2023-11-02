@@ -28,9 +28,9 @@ public class UserTest {
 
     @Test
     public void userUpdateAndCheckResult() {
-        User user = new User(0, "email@", "login", "name", LocalDate.now());
+        User user = new User(1, "email@", "login", "name", LocalDate.now());
         userController.postUser(user);
-        User user1 = new User(0, "email@", "login", "Sergey", LocalDate.now().plusDays(1L));
+        User user1 = new User(1, "email@", "login", "Sergey", LocalDate.now().plusDays(1L));
         userController.updateUser(user1);
         long userId = user.getId();
         long user1Id = user1.getId();

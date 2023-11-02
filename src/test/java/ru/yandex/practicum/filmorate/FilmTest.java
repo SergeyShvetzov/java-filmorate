@@ -28,9 +28,9 @@ public class FilmTest {
 
     @Test
     public void filmUpdateAndCheckResult() {
-        Film film = new Film(0, "Титаник", "Описание", LocalDate.now(), 60);
+        Film film = new Film(1, "Титаник", "Описание", LocalDate.now(), 60);
         filmController.postFilm(film);
-        Film film1 = new Film(0, "Интерстеллар", "Описание", LocalDate.now(), 90);
+        Film film1 = new Film(1, "Интерстеллар", "Описание", LocalDate.now(), 90);
         filmController.updateFilm(film1);
         long filmId = film.getId();
         long film1Id = film1.getId();
