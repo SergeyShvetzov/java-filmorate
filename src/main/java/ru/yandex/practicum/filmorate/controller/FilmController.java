@@ -1,82 +1,81 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import lombok.Generated;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-
 @RestController
-@RequestMapping("/film")
-@Slf4j
+@RequestMapping({"/film"})
 public class FilmController {
+    @Generated
+    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
+    private final Map<Integer, Film> films = new HashMap();
 
-    private final Map<Integer, Film> films = new HashMap<>();
+    public FilmController() {
+    }
 
     @GetMapping
     public Collection<Film> getFilm() {
         log.info("Был вызван метод GET /film.");
-        log.info("Текущее количество фильмов - " + films.keySet().size() + "\n");
-        return films.values();
+        log.info("Текущее количество фильмов - " + this.films.keySet().size() + "\n");
+        return this.films.values();
     }
 
-
-    /*
-    Проверьте данные, которые приходят в запросе на добавление нового фильма или пользователя.
-    Эти данные должны соответствовать определённым критериям.
-
-    - название не может быть пустым  !!! Сделано !!!
-    - максимальная длина описания — 200 символов; !!! Сделано !!!
-    - дата релиза — не раньше 28 декабря 1895 года; !!! Сделано !!!
-    - продолжительность фильма должна быть положительной. !!! Сделано !!!
-    */
     @PostMapping
     public Film postFilm(@RequestBody Film film) {
-
         log.info("Был вызван метод POST /film.");
-
-        if (film.getName() == null || film.getName().isBlank()) {
-
-            throw new ValidationException("Название фильма не может быть пустым.");
-        }
-
-        if (film.getDescription().length() > 200) {
-            throw new ValidationException("Максимальная длина описания фильма не может превышать 200 " +
-                    "символов. Длина описания - " + film.getDescription().length());
-        }
-
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года. " +
-                    "Указанная дата - " + film.getReleaseDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        }
-
-        if (film.getDuration() < 0) {
-            throw new ValidationException("Продолжительность фильма не может быть меньше 0.");
-        }
-
-        films.put(film.getId(), film);
-
+        validateFilm(film);
+        this.films.put(film.getId(), film);
         log.info("Новый фильм - " + film.getName() + " успешно добавлен.");
-        log.info("Текущее количество фильмов - " + films.keySet().size() + "\n");
-
+        log.info("Текущее количество фильмов - " + this.films.keySet().size() + "\n");
         return film;
+    }
+
+    private static void validateFilm(Film film) {
+        String message;
+        if (film.getName() != null && !film.getName().isBlank()) {
+            if (film.getDescription().length() > 200) {
+                message = "Максимальная длина описания больше 200 символов ";
+                log.error(message);
+                throw new ValidationException(message + "символов. Длина описания - " + film.getDescription().length());
+            } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+                message = "Указанная дата релиза раньше 28 декабря 1895 года. ";
+                log.error(message);
+                throw new ValidationException(message + "Указанная дата - " + film.getReleaseDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+            } else if (film.getDuration() < 0) {
+                message = "Продолжительность фильма меньше 0";
+                log.error(message);
+                throw new ValidationException(message);
+            }
+        } else {
+            message = "Указано пустое название фильма.";
+            log.error(message);
+            throw new ValidationException(message);
+        }
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-
         log.info("Был вызван метод PUT /film.");
-
-        if (!(films.containsKey(film.getId()))) {
+        if (!this.films.containsKey(film.getId())) {
             throw new ValidationException("Фильм с id " + film.getId() + " не был найден.");
+        } else {
+            this.films.put(film.getId(), film);
+            log.info("Фильм c id - " + film.getId() + " был успешно обновлен.\n");
+            return film;
         }
-        films.put(film.getId(), film);
-
-        log.info("Фильм c id - " + film.getId() + " был успешно обновлен.\n");
-
-        return film;
     }
 }
