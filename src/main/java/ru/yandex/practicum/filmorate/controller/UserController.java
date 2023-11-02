@@ -19,7 +19,7 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final Map<Long, User> users = new HashMap<>();
 
-    private long generatorId = 0;
+    private long generatorId = 1;
 
     @GetMapping
     public Collection<User> getUsers() {
@@ -36,8 +36,7 @@ public class UserController {
         users.put(user.getId(), user);
         log.info("Новый пользователь с логином - " + user.getLogin() + " успешно добавлен.");
         log.info("Текущее количество пользователей - " + users.keySet().size() + "\n");
-        return users.get(user.getId());
-
+        return user;
     }
 
     private static void validateUser(User user) {
@@ -70,13 +69,14 @@ public class UserController {
     }
 
     @PutMapping
-    public void updateUser(@RequestBody User user) {
+    public User updateUser(@RequestBody User user) {
         log.info("Был вызван метод PUT /users.");
         if (!users.containsKey(user.getId())) {
             throw new ValidationException("Пользователь с id " + user.getId() + " не был найден.");
         } else {
             users.put(user.getId(), user);
             log.info("Данные пользователя c id - " + user.getId() + " были успешно обновлены.\n");
+            return user;
         }
     }
 
