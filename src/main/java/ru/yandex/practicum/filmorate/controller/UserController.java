@@ -21,7 +21,7 @@ import ru.yandex.practicum.filmorate.model.User;
 public class UserController {
     @Generated
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final Map<Integer, User> users = new HashMap();
+    private final Map<Integer, User> users = new HashMap<>();
 
     public UserController() {
     }
