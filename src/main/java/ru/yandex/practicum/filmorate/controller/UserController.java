@@ -29,14 +29,14 @@ public class UserController {
     }
 
     @PostMapping
-    public User postUser(@RequestBody User user) {
+    public void postUser(@RequestBody User user) {
         log.info("Был вызван метод POST /users.");
         validateUser(user);
         user.setId(generateId());
         users.put(user.getId(), user);
         log.info("Новый пользователь с логином - " + user.getLogin() + " успешно добавлен.");
         log.info("Текущее количество пользователей - " + users.keySet().size() + "\n");
-        return user;
+
     }
 
     private static void validateUser(User user) {
@@ -69,14 +69,13 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) {
+    public void updateUser(@RequestBody User user) {
         log.info("Был вызван метод PUT /users.");
         if (!users.containsKey(user.getId())) {
             throw new ValidationException("Пользователь с id " + user.getId() + " не был найден.");
         } else {
             users.put(user.getId(), user);
             log.info("Данные пользователя c id - " + user.getId() + " были успешно обновлены.\n");
-            return user;
         }
     }
 
