@@ -58,7 +58,7 @@ public class FilmTest {
         String symbol201 = "";
         StringBuilder result = new StringBuilder();
 
-        for(int i = 0; i < 104; ++i) {
+        for (int i = 0; i < 104; ++i) {
             symbol201 = String.valueOf(i);
             result.append(symbol201);
         }
