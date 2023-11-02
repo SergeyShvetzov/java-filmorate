@@ -22,25 +22,25 @@ import ru.yandex.practicum.filmorate.model.Film;
 public class FilmController {
     @Generated
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final Map<Long, Film> films = new HashMap<>();
 
-    public FilmController() {
-    }
+    private long generatorId = 0;
 
     @GetMapping
     public Collection<Film> getFilm() {
-        log.info("Был вызван метод GET /film.");
-        log.info("Текущее количество фильмов - " + this.films.keySet().size() + "\n");
-        return this.films.values();
+        log.info("Был вызван метод GET /films.");
+        log.info("Текущее количество фильмов - " + films.keySet().size() + "\n");
+        return films.values();
     }
 
     @PostMapping
     public Film postFilm(@RequestBody Film film) {
-        log.info("Был вызван метод POST /film.");
+        log.info("Был вызван метод POST /films.");
         validateFilm(film);
-        this.films.put(film.getId(), film);
+        film.setId(generateId());
+        films.put(film.getId(), film);
         log.info("Новый фильм - " + film.getName() + " успешно добавлен.");
-        log.info("Текущее количество фильмов - " + this.films.keySet().size() + "\n");
+        log.info("Текущее количество фильмов - " + films.keySet().size() + "\n");
         return film;
     }
 
@@ -69,13 +69,17 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        log.info("Был вызван метод PUT /film.");
-        if (!this.films.containsKey(film.getId())) {
+        log.info("Был вызван метод PUT /films.");
+        if (!films.containsKey(film.getId())) {
             throw new ValidationException("Фильм с id " + film.getId() + " не был найден.");
         } else {
-            this.films.put(film.getId(), film);
+            films.put(film.getId(), film);
             log.info("Фильм c id - " + film.getId() + " был успешно обновлен.\n");
             return film;
         }
+    }
+
+    private long generateId() {
+        return generatorId++;
     }
 }

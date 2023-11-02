@@ -12,31 +12,28 @@ import ru.yandex.practicum.filmorate.model.Film;
 public class FilmTest {
     private FilmController filmController;
 
-    public FilmTest() {
-    }
-
     @BeforeEach
     public void setUp() {
-        this.filmController = new FilmController();
+        filmController = new FilmController();
     }
 
     @Test
     public void filmReceiptCheck() {
         Film film = new Film(1, "Титаник", "Описание", LocalDate.now(), 60);
-        this.filmController.postFilm(film);
-        Collection<Film> filmList = this.filmController.getFilm();
+        filmController.postFilm(film);
+        Collection<Film> filmList = filmController.getFilm();
         Assertions.assertNotNull(filmList);
         Assertions.assertEquals(1, filmList.size());
     }
 
     @Test
     public void filmUpdateAndCheckResult() {
-        Film film = new Film(1, "Титаник", "Описание", LocalDate.now(), 60);
-        this.filmController.postFilm(film);
-        Film film1 = new Film(1, "Интерстеллар", "Описание", LocalDate.now(), 90);
-        this.filmController.updateFilm(film1);
-        int filmId = film.getId();
-        int film1Id = film1.getId();
+        Film film = new Film(0, "Титаник", "Описание", LocalDate.now(), 60);
+        filmController.postFilm(film);
+        Film film1 = new Film(0, "Интерстеллар", "Описание", LocalDate.now(), 90);
+        filmController.updateFilm(film1);
+        long filmId = film.getId();
+        long film1Id = film1.getId();
         Assertions.assertEquals(filmId, film1Id);
         String filmName = film.getName();
         String film1Name = film1.getName();
@@ -48,11 +45,11 @@ public class FilmTest {
     public void filmEmptyName() {
         Film film = new Film(1, "", "Описание", LocalDate.now(), 60);
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.filmController.postFilm(film);
+            filmController.postFilm(film);
         });
         Film film1 = new Film(1, "        ", "Описание", LocalDate.now(), 60);
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.filmController.postFilm(film1);
+            filmController.postFilm(film1);
         });
     }
 
@@ -68,7 +65,7 @@ public class FilmTest {
 
         Film film = new Film(1, "Интерстеллар", result.toString(), LocalDate.now(), 60);
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.filmController.postFilm(film);
+            filmController.postFilm(film);
         });
     }
 
@@ -76,7 +73,7 @@ public class FilmTest {
     public void releaseDateCheckMustNotBeEarlierThan28December1895year() {
         Film film = new Film(1, "Интерстеллар", "Описание", LocalDate.of(1895, 12, 27), 60);
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.filmController.postFilm(film);
+            filmController.postFilm(film);
         });
     }
 
@@ -84,7 +81,7 @@ public class FilmTest {
     public void checkingMovieDurationForANegativeValue() {
         Film film = new Film(1, "Интерстеллар", "Описание", LocalDate.now(), -1);
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.filmController.postFilm(film);
+            filmController.postFilm(film);
         });
     }
 }

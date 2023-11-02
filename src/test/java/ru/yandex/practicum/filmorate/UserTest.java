@@ -12,31 +12,28 @@ import ru.yandex.practicum.filmorate.model.User;
 public class UserTest {
     private UserController userController;
 
-    public UserTest() {
-    }
-
     @BeforeEach
     public void setUp() {
-        this.userController = new UserController();
+        userController = new UserController();
     }
 
     @Test
     public void filmReceiptCheck() {
         User user = new User(1, "email@", "login", "name", LocalDate.now());
-        this.userController.postUser(user);
-        Collection<User> filmList = this.userController.getUsers();
+        userController.postUser(user);
+        Collection<User> filmList = userController.getUsers();
         Assertions.assertNotNull(filmList);
         Assertions.assertEquals(1, filmList.size());
     }
 
     @Test
-    public void filmUpdateAndCheckResult() {
-        User user = new User(1, "email@", "login", "name", LocalDate.now());
-        this.userController.postUser(user);
-        User user1 = new User(1, "email@", "login", "Sergey", LocalDate.now().plusDays(1L));
-        this.userController.updateUser(user1);
-        int userId = user.getId();
-        int user1Id = user1.getId();
+    public void userUpdateAndCheckResult() {
+        User user = new User(0, "email@", "login", "name", LocalDate.now());
+        userController.postUser(user);
+        User user1 = new User(0, "email@", "login", "Sergey", LocalDate.now().plusDays(1L));
+        userController.updateUser(user1);
+        long userId = user.getId();
+        long user1Id = user1.getId();
         Assertions.assertEquals(userId, user1Id);
         String filmName = user.getName();
         String film1Name = user1.getName();
@@ -48,11 +45,11 @@ public class UserTest {
     public void userEmptyEmail() {
         User user = new User(1, "", "login", "name", LocalDate.now());
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.userController.postUser(user);
+            userController.postUser(user);
         });
         User user1 = new User(1, "           ", "login", "name", LocalDate.now());
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.userController.postUser(user1);
+            userController.postUser(user1);
         });
     }
 
@@ -60,7 +57,7 @@ public class UserTest {
     public void checkingEmailForSymbol() {
         User user = new User(1, "email", "login", "name", LocalDate.now().plusDays(1L));
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.userController.postUser(user);
+            userController.postUser(user);
         });
     }
 
@@ -68,18 +65,18 @@ public class UserTest {
     public void loginMustNotBeEmptyOrContainSpaces() {
         User user = new User(1, "email@", "", "name", LocalDate.now().plusDays(1L));
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.userController.postUser(user);
+            userController.postUser(user);
         });
         User user1 = new User(1, "email@", "    ", "name", LocalDate.now().plusDays(1L));
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.userController.postUser(user1);
+            userController.postUser(user1);
         });
     }
 
     @Test
     public void ifThNameIsEmptyThenItShouldBeTheSameAsTheLogin() {
         User user = new User(1, "email@", "login", "", LocalDate.now());
-        this.userController.postUser(user);
+        userController.postUser(user);
         Assertions.assertEquals(user.getLogin(), user.getName());
     }
 
@@ -87,7 +84,7 @@ public class UserTest {
     public void checkDateOfBirthForFutureTense() {
         User user = new User(1, "email@", "login", "name", LocalDate.now().plusDays(1L));
         Assertions.assertThrows(ValidationException.class, () -> {
-            this.userController.postUser(user);
+            userController.postUser(user);
         });
     }
 }

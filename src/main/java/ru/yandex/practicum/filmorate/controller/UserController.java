@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,29 +19,29 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 @RestController
-@RequestMapping({"/users"})
+@RequestMapping("/users")
 public class UserController {
     @Generated
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final Map<Integer, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
 
-    public UserController() {
-    }
+    private long generatorId = 0;
 
     @GetMapping
     public Collection<User> getUsers() {
-        log.info("Был вызван метод GET /user.");
-        log.info("Текущее количество пользователей - " + this.users.keySet().size() + "\n");
-        return this.users.values();
+        log.info("Был вызван метод GET /users.");
+        log.info("Текущее количество пользователей - " + users.keySet().size() + "\n");
+        return users.values();
     }
 
     @PostMapping
     public User postUser(@RequestBody User user) {
-        log.info("Был вызван метод POST /user.");
+        log.info("Был вызван метод POST /users.");
         validateUser(user);
-        this.users.put(user.getId(), user);
+        user.setId(generateId());
+        users.put(user.getId(), user);
         log.info("Новый пользователь с логином - " + user.getLogin() + " успешно добавлен.");
-        log.info("Текущее количество пользователей - " + this.users.keySet().size() + "\n");
+        log.info("Текущее количество пользователей - " + users.keySet().size() + "\n");
         return user;
     }
 
@@ -74,13 +76,17 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        log.info("Был вызван метод PUT /user.");
-        if (!this.users.containsKey(user.getId())) {
+        log.info("Был вызван метод PUT /users.");
+        if (!users.containsKey(user.getId())) {
             throw new ValidationException("Пользователь с id " + user.getId() + " не был найден.");
         } else {
-            this.users.put(user.getId(), user);
+            users.put(user.getId(), user);
             log.info("Данные пользователя c id - " + user.getId() + " были успешно обновлены.\n");
             return user;
         }
+    }
+
+    private long generateId() {
+        return generatorId++;
     }
 }
