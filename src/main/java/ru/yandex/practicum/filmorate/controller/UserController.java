@@ -29,13 +29,14 @@ public class UserController {
     }
 
     @PostMapping
-    public void postUser(@RequestBody User user) {
+    public User postUser(@RequestBody User user) {
         log.info("Был вызван метод POST /users.");
         validateUser(user);
         user.setId(generateId());
         users.put(user.getId(), user);
         log.info("Новый пользователь с логином - " + user.getLogin() + " успешно добавлен.");
         log.info("Текущее количество пользователей - " + users.keySet().size() + "\n");
+        return users.get(user.getId());
 
     }
 
