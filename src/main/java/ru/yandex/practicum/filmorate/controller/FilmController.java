@@ -18,11 +18,11 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 @RestController
-@RequestMapping({"/film"})
+@RequestMapping({"/films"})
 public class FilmController {
     @Generated
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final Map<Integer, Film> films = new HashMap();
+    private final Map<Integer, Film> films = new HashMap<>();
 
     public FilmController() {
     }

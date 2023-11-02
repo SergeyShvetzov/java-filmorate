@@ -17,7 +17,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 @RestController
-@RequestMapping({"/user"})
+@RequestMapping({"/users"})
 public class UserController {
     @Generated
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
