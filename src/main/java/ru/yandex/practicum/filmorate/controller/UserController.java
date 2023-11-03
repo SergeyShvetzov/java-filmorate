@@ -74,6 +74,7 @@ public class UserController {
         if (!users.containsKey(user.getId())) {
             throw new ValidationException("Пользователь с id " + user.getId() + " не был найден.");
         } else {
+            validateUser(user);
             users.put(user.getId(), user);
             log.info("Данные пользователя c id - " + user.getId() + " были успешно обновлены.\n");
             return user;

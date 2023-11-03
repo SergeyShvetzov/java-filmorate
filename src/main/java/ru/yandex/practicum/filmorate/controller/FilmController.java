@@ -73,6 +73,7 @@ public class FilmController {
         if (!films.containsKey(film.getId())) {
             throw new ValidationException("Фильм с id " + film.getId() + " не был найден.");
         } else {
+            validateFilm(film);
             films.put(film.getId(), film);
             log.info("Фильм c id - " + film.getId() + " был успешно обновлен.\n");
             return film;
