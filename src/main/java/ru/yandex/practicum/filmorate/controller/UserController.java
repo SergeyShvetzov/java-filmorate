@@ -1,87 +1,83 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.Generated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    @Generated
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final Map<Long, User> users = new HashMap<>();
 
-    private long generatorId = 1;
+    private final UserStorage userStorage;
+    private final UserService userService;
 
+    @Autowired
+    public UserController(UserStorage userStorage, UserService userService) {
+        this.userStorage = userStorage;
+        this.userService = userService;
+    }
+
+    // получение списка всех пользователей
     @GetMapping
     public Collection<User> getUsers() {
-        log.info("Был вызван метод GET /users.");
-        log.info("Текущее количество пользователей - " + users.keySet().size() + "\n");
-        return users.values();
+        return userStorage.getUsers();
     }
 
+    // получение пользователя по id
+    @GetMapping("/{userId}")
+    public User findUserById(@PathVariable long userId) {
+        return userStorage.findUserById(userId);
+    }
+
+    // добавление пользователя
     @PostMapping
     public User postUser(@RequestBody User user) {
-        log.info("Был вызван метод POST /users.");
-        validateUser(user);
-        user.setId(generateId());
-        users.put(user.getId(), user);
-        log.info("Новый пользователь с логином - " + user.getLogin() + " успешно добавлен.");
-        log.info("Текущее количество пользователей - " + users.keySet().size() + "\n");
-        return user;
+        return userStorage.postUser(user);
     }
 
-    private static void validateUser(User user) {
-        String message;
-        if (!user.getEmail().isBlank() && user.getEmail() != null) {
-            if (!user.getEmail().contains("@")) {
-                message = "Адрес электронной почты должен содержать символ '@'. ";
-                log.error(message);
-                throw new ValidationException(message + "Ваш адрес - " + user.getEmail());
-            } else if (user.getLogin() != null && !user.getLogin().isBlank()) {
-                if (user.getName() == null || user.getName().isBlank()) {
-                    user.setName(user.getLogin());
-                }
-
-                if (user.getBirthday().isAfter(LocalDate.now())) {
-                    message = "Дата рождения указана в будущем времени. ";
-                    log.error(message);
-                    throw new ValidationException(message + "Указанная дата - " + user.getBirthday());
-                }
-            } else {
-                message = "Логин не может быть пустым или содержать пробелы.";
-                log.error(message);
-                throw new ValidationException(message);
-            }
-        } else {
-            message = "Адрес электронной почты не может быть пустым.";
-            log.error(message);
-            throw new ValidationException(message);
-        }
-    }
-
+    // обновление данных пользователя
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        log.info("Был вызван метод PUT /users.");
-        if (!users.containsKey(user.getId())) {
-            throw new ValidationException("Пользователь с id " + user.getId() + " не был найден.");
-        } else {
-            validateUser(user);
-            users.put(user.getId(), user);
-            log.info("Данные пользователя c id - " + user.getId() + " были успешно обновлены.\n");
-            return user;
-        }
+        return userStorage.updateUser(user);
     }
 
-    private long generateId() {
-        return generatorId++;
+    // удалить всех пользователей
+    @DeleteMapping
+    public String deleteAllUsers() {
+        return userStorage.deleteAllUsers();
+    }
+
+    // удалить пользователя по id
+    @DeleteMapping("/user/{userId}")
+    public String deleteUserById(@PathVariable long userId) {
+        return userStorage.deleteUserById(userId);
+    }
+
+    // PUT /users/{id}/friends/{friendId} — добавление в друзья.
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addInFriend(@PathVariable long id, @PathVariable long friendId) {
+        return userService.addInFriend(id, friendId);
+    }
+
+    // DELETE /users/{id}/friends/{friendId} — удаление из друзей.
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User removeFromFriends(@PathVariable long id, @PathVariable long friendId) {
+        return userService.removeFromFriends(id, friendId);
+    }
+
+    // GET /users/{id}/friends — возвращаем список пользователей, являющихся его друзьями.
+    @GetMapping("/{id}/friends")
+    public Collection<User> getUserFriends(@PathVariable long id) {
+        return userService.getUserFriends(id);
+    }
+
+    // GET /users/{id}/friends/common/{otherId} — список друзей, общих с другим пользователем.
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> getListMutualFriends(@PathVariable long id, @PathVariable long otherId) {
+        return userService.getListMutualFriends(id, otherId);
     }
 }
