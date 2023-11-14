@@ -23,6 +23,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public final Map<Long, Film> films = new HashMap<>();
     private long generatorId = 1;
+
     @Override
     public Collection<Film> getFilm() {
         log.info("Был вызван метод GET /films.");
