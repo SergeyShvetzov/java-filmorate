@@ -4,7 +4,6 @@ import lombok.Generated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -18,10 +17,12 @@ import java.util.Map;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    @Generated
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
-    public final Map<Long, Film> films = new HashMap<>();
+
+    @Generated
+    private static final Logger log = LoggerFactory.getLogger(InMemoryFilmStorage.class);
+
+    private final Map<Long, Film> films = new HashMap<>();
     private long generatorId = 1;
 
     @Override
@@ -37,7 +38,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.values().stream()
                 .filter(film -> film.getId() == filmId)
                 .findFirst()
-                .orElseThrow(() -> new FilmNotFoundException("Фильм не был найден."));
+                .orElseThrow(() -> new FilmNotFoundException(String.format("Фильм под № %d не найден", filmId)));
     }
 
     @Override
@@ -51,7 +52,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    private static void validateFilm(Film film) {
+    private void validateFilm(Film film) {
         String message;
         if (film.getName() != null && !film.getName().isBlank()) {
             if (film.getDescription().length() > 200) {
@@ -78,7 +79,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         log.info("Был вызван метод PUT /films.");
         if (!films.containsKey(film.getId())) {
-            throw new ValidationException("Фильм с id " + film.getId() + " не был найден.");
+            String message = "Фильм с id " + film.getId() + " не был найден.";
+            log.error(message);
+            throw new ValidationException(message);
         } else {
             validateFilm(film);
             films.put(film.getId(), film);
@@ -91,19 +94,24 @@ public class InMemoryFilmStorage implements FilmStorage {
     public String deleteAllFilms() {
         log.info("Был вызван метод DELETE /films");
         films.clear();
-        return "Все фильмы удалены.";
+        String message = "Все фильмы успешно удалены.";
+        log.info(message);
+        return message;
     }
 
     @Override
     public String deleteFilmById(long filmId) {
         log.info("Был вызван метод DELETE /films/film/{filmId}.");
         if (!(films.containsKey(filmId))) {
-            throw new FilmNotFoundException(String.format("Фильм № %s не найден", filmId));
+            String message = String.format("Фильм № %s не найден", filmId);
+            log.error(message);
+            throw new FilmNotFoundException(message);
         }
         String savedFilmName = films.get(filmId).getName();
         films.remove(filmId);
-        log.info("Фильм с id - " + filmId + " удален.");
-        return String.format("Фильм %s был успешно удален.", savedFilmName);
+        String message = String.format("Фильм %s был успешно удален.", savedFilmName);
+        log.info(message);
+        return message;
     }
 
     private long generateId() {

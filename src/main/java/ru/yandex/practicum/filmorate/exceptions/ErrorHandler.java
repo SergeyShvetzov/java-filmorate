@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
+import lombok.Generated;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -9,33 +12,46 @@ import ru.yandex.practicum.filmorate.model.ErrorResponse;
 @RestControllerAdvice
 public class ErrorHandler {
 
+    @Generated
+    private static final Logger log = LoggerFactory.getLogger(ErrorHandler.class);
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleInvalidEmailException(final InvalidEmailException e) {
-        return new ErrorResponse(e.getMessage(), "Email не соответствует требованиям.");
+        String message = "Email не соответствует требованиям.";
+        log.error(message);
+        return new ErrorResponse(e.getMessage(), message);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handlePostNotFoundException(final FilmNotFoundException e) {
-        return new ErrorResponse(e.getMessage(), "Фильм не найден.");
+        String message = "Фильм не найден.";
+        log.error(message);
+        return new ErrorResponse(e.getMessage(), message);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(final UserNotFoundException e) {
-        return new ErrorResponse(e.getMessage(), "Пользователь не найден.");
+        String message = "Пользователь не найден.";
+        log.error(message);
+        return new ErrorResponse(e.getMessage(), message);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlePostNotFoundException(final UserAlreadyExistException e) {
-        return new ErrorResponse(e.getMessage(), "Пользователь с данным email уже существует.");
+        String message = "Пользователь с данным email уже существует.";
+        log.error(message);
+        return new ErrorResponse(e.getMessage(), message);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
-        return new ErrorResponse(e.getMessage(), "Произошла непредвиденная ошибка.");
+        String message = "Произошла непредвиденная ошибка.";
+        log.error(message);
+        return new ErrorResponse(e.getMessage(), message);
     }
 }

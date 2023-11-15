@@ -4,7 +4,6 @@ import lombok.Generated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -17,8 +16,8 @@ import java.util.stream.Collectors;
 public class InMemoryUserStorage implements UserStorage {
 
     @Generated
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    public final Map<Long, User> users = new HashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(InMemoryUserStorage.class);
+    private final Map<Long, User> users = new HashMap<>();
 
     private long generatorId = 1;
 
@@ -35,7 +34,7 @@ public class InMemoryUserStorage implements UserStorage {
         return users.values().stream()
                 .filter(user -> user.getId() == userId)
                 .findFirst()
-                .orElseThrow(() -> new UserNotFoundException(String.format("Пользователь № %d не найден", userId)));
+                .orElseThrow(() -> new UserNotFoundException(String.format("Пользователь с id %d не найден", userId)));
     }
 
     @Override
@@ -49,7 +48,7 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    private static void validateUser(User user) {
+    private void validateUser(User user) {
         String message;
         if (!user.getEmail().isBlank() && user.getEmail() != null) {
             if (!user.getEmail().contains("@")) {
@@ -82,11 +81,15 @@ public class InMemoryUserStorage implements UserStorage {
     public User updateUser(User user) {
         log.info("Был вызван метод PUT /users.");
         if (!users.containsKey(user.getId())) {
-            throw new ValidationException("Пользователь с id " + user.getId() + " не был найден.");
+            String message = String.format("Пользователь с id %s не был найден.", user.getId());
+            log.info(message);
+            throw new UserNotFoundException(message);
         } else {
             validateUser(user);
             users.put(user.getId(), user);
-            log.info("Данные пользователя c id - " + user.getId() + " были успешно обновлены.\n");
+            String message = String.format("Данные пользователя c id - " + user.getId()
+                    + " были успешно обновлены.", user.getId());
+            log.info(message);
             return user;
         }
     }
@@ -95,31 +98,30 @@ public class InMemoryUserStorage implements UserStorage {
     public String deleteAllUsers() {
         log.info("Был вызван метод DELETE /users");
         users.clear();
-        return "Все пользователи удалены.";
+        String message = "Все пользователи успешно удалены.";
+        log.info(message);
+        return message;
     }
 
     @Override
     public String deleteUserById(long userId) {
         log.info("Был вызван метод DELETE /users/user/{userId}.");
         if (!(users.containsKey(userId))) {
-            throw new UserNotFoundException(String.format("Пользователь № %s не найден", userId));
+            String message = String.format("Пользователь № %s не найден", userId);
+            log.error(message);
+            throw new UserNotFoundException(message);
         }
-        String savedFilmName = users.get(userId).getName();
         users.remove(userId);
-        log.info("Пользователь с id - " + userId + " удален.");
-        return String.format("Пользователь %s был успешно удален.", savedFilmName);
-    }
-
-    public User getUser(long userId) {
-        if (!(users.containsKey(userId))) {
-            throw new UserNotFoundException("Такого пользователя не существует");
-        }
-        return users.get(userId);
+        String message = String.format("Пользователь с id %s был успешно удален.", userId);
+        log.info(message);
+        return message;
     }
 
     public Collection<User> getUserFriends(long userId) {
         if (!(users.containsKey(userId))) {
-            throw new UserNotFoundException("Такого пользователя не существует");
+            String message = String.format("Пользователь с id %s не зарегистрирован.", userId);
+            log.error(message);
+            throw new UserNotFoundException(message);
         }
         Set<Long> friends = users.get(userId).getFriends();
         return friends.stream()
@@ -129,10 +131,14 @@ public class InMemoryUserStorage implements UserStorage {
 
     public Collection<User> getListMutualFriends(long id, long otherId) {
         if (!(users.containsKey(id))) {
-            throw new UserNotFoundException("Пользователя с id - " + id + " не существует");
+            String message = String.format("Пользователь с id %s не зарегистрирован.", id);
+            log.error(message);
+            throw new UserNotFoundException(message);
         }
         if (!(users.containsKey(otherId))) {
-            throw new UserNotFoundException("Пользователя с id - " + otherId + " не существует");
+            String message = String.format("Пользователь с id %s не зарегистрирован.", otherId);
+            log.error(message);
+            throw new UserNotFoundException(message);
         }
         Set<Long> user = users.get(id).getFriends();
         Set<Long> otherUser = users.get(otherId).getFriends();
