@@ -119,7 +119,7 @@ public class UserTest<T extends UserStorage> {
     }
 
     @Test
-    public void GettingListOfAllTheUsersFriends() {
+    public void gettingListOfAllTheUsersFriends() {
         User user = new User(1, "email@", "login", "name", LocalDate.now(), null);
         userService.postUser(user);
         User user2 = new User(2, "email.2@", "login 2", "name 2", LocalDate.now(), null);
@@ -133,7 +133,7 @@ public class UserTest<T extends UserStorage> {
     }
 
     @Test
-    public void GettingListOfMutualFriendsOfAnotherUser() {
+    public void gettingListOfMutualFriendsOfAnotherUser() {
         User user = new User(1, "email@", "login", "name", LocalDate.now(), null);
         userService.postUser(user);
         User user2 = new User(2, "email.2@", "login 2", "name 2", LocalDate.now(), null);
