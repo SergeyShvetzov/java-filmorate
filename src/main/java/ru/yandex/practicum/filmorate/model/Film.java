@@ -15,23 +15,24 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
-    private Set<String> likes;
+    private Set<Long> likes;
     private Integer likesCount;
 
     public Film() {
         this.likesCount = 0;
     }
 
-    public void setLikes(String userEmail) {
+    public void setLikes(Long userId) {
         if (likes == null) {
             likes = new HashSet<>();
             setLikesCount(0);
         }
-        likes.add(userEmail);
+        likes.add(userId);
         setLikesCount(likes.size());
     }
 
-    public void deleteLike(String userEmail) {
-        likes.remove(userEmail);
+    public void deleteLike(Long userId) {
+        likes.remove(userId);
+        likesCount--;
     }
 }
