@@ -16,8 +16,10 @@ import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import java.time.LocalDate;
 import java.util.Collection;
 
-public class FilmTest <T extends FilmStorage> {
+public class FilmTest < T extends FilmStorage > {
+
     private FilmService filmService;
+
     @BeforeEach
     public void setUp() {
         InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
