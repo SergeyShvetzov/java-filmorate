@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
 
-public class UserTest <T extends UserStorage> {
+public class UserTest<T extends UserStorage> {
 
     private UserService userService;
 
